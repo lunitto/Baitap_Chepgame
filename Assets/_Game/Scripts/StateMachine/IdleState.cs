@@ -8,6 +8,8 @@ public class IdleState : IState
     float timer;
     public void OnEnter(Enemy enemy)
     {
+        //Debug.LogError("IdleState");
+
         enemy.StopMoving();
         timer = 0f;
         randomTime = Random.Range(2f, 4f);
@@ -18,6 +20,8 @@ public class IdleState : IState
         timer += Time.deltaTime;
         if (timer > randomTime)
         {
+            //Debug.LogError("PatrolState");
+
             enemy.ChangeState(new PatrolState());
         }
     }

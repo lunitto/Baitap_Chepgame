@@ -11,7 +11,7 @@ public class Character : MonoBehaviour
 
     public bool IsDeath => hp <= 0; // khi nao chet tra ve hp <= 0
 
-    private void start()
+    private void Start() 
     {
         OnInit();
     }
@@ -28,7 +28,8 @@ public class Character : MonoBehaviour
 
     protected virtual void OnDeath()
     {
-        
+        ChangeAnim("die");
+        Invoke(nameof(OnDespawn), 2f);
     }
 
     protected void ChangeAnim(string animName)
