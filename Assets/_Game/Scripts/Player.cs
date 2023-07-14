@@ -15,12 +15,12 @@ public class Player : Character
     [SerializeField] private Transform throwPoint;
     [SerializeField] private GameObject attackArea;
 
-    private bool isGrounded = true;
-    private bool isJumping = false;
-    private bool isAttack = false;
+    [SerializeField] private bool isGrounded = true;
+    [SerializeField] private bool isJumping = false;
+    [SerializeField] private bool isAttack = false;
     //private bool isDeath = false;
     private float horizontal;
-    
+    private int jumpCount = 0;
     private int coin = 0;
     private Vector3 savePoint;
 
@@ -56,7 +56,7 @@ public class Player : Character
             }
 
             //jump
-            if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+            if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !isJumping)
             {
                 Jump();
             }
@@ -101,6 +101,7 @@ public class Player : Character
         {
             ChangeAnim("idle");
             rb.velocity = Vector2.zero;
+            jumpCount = 0;
         }
 
     }
@@ -150,33 +151,67 @@ public class Player : Character
 
     public void Attack()
     {
-        ChangeAnim("attack");
-        isAttack = true;
-        Invoke(nameof(ResetAttack), 0.5f);
-        ActiveAttack();
-        Invoke(nameof(DeActiveAttack), 0.5f);
+        if (isJumping)
+        {
+            ChangeAnim("jumpAttack");
+            isAttack = true;
+            Invoke(nameof(ResetAttack), 0.5f);
+            ActiveAttack();
+            Invoke(nameof(DeActiveAttack), 0.5f);
+        }
+        if (!isJumping)
+        {
+            ChangeAnim("attack");
+            isAttack = true;
+            Invoke(nameof(ResetAttack), 0.5f);
+            ActiveAttack();
+            Invoke(nameof(DeActiveAttack), 0.5f);
+        }
     }
 
     public void Throw()
     {
-        ChangeAnim("throw");
-        isAttack = true;
-        Invoke(nameof(ResetAttack), 0.5f);
+        if (!isJumping)
+        {
+            ChangeAnim("throw");
+            isAttack = true;
+            Invoke(nameof(ResetAttack), 0.5f);
 
-        Instantiate(kunaiFrefab, throwPoint.position, throwPoint.rotation);
+            Instantiate(kunaiFrefab, throwPoint.position, throwPoint.rotation);
+        }
+        if (isJumping)
+        {
+            ChangeAnim("jumpThrow");
+            isAttack = true;
+            Invoke(nameof(ResetAttack), 0.5f);
+
+            Instantiate(kunaiFrefab, throwPoint.position, throwPoint.rotation);
+        }
+            
+        //ChangeAnim("jumpThrow");
+        //isAttack = true;
+        //Invoke(nameof(ResetAttack), 0.5f);
+
+        //Instantiate(kunaiFrefab, throwPoint.position, throwPoint.rotation);
     }
 
     private void ResetAttack()
     {
-        ChangeAnim("ilde"); // idle bị loi
+        ChangeAnim("idle"); // idle bị loi
         isAttack = false;
     }
 
     public void Jump()
     {
-        isJumping = true;
-        ChangeAnim("jump");
-        rb.AddForce(jumpFore * Vector2.up);
+        if (jumpCount < 2)
+        {
+            isJumping = true;
+            ChangeAnim("jump");
+            rb.AddForce(jumpFore * Vector2.up);
+            jumpCount++;
+        }
+            
+        
     }
 
     
@@ -198,6 +233,7 @@ public class Player : Character
 
     public void SetMove(float horizontal)
     {
+        Debug.Log("SetMove");
         this.horizontal = horizontal;
     }
 
